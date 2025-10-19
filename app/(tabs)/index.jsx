@@ -11,54 +11,56 @@ import {
   View,
 } from 'react-native';
 
-import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase/firebaseconfig'; // adjust path if needed
-// import { auth } from '../../firebase/firebaseconfig'; // adjust path if needed
+import {
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+} from 'firebase/auth';
 
+import { auth } from '../../firebase/firebaseconfig'; // adjust path if needed
 
 const primaryColor = '#38e07b';
 const backgroundLight = '#f6f8f7';
-const backgroundDark = '#122017';
 
 export default function LoginScreen() {
   const router = useRouter();
 
-  const handleForgotPassword = () => {
-  if (!email) {
-    Alert.alert('Reset Password', 'Please enter your email address first.');
-    return;
-  }
-
-  sendPasswordResetEmail(auth, email)
-    .then(() => {
-      Alert.alert(
-        'Reset Email Sent',
-        'Check your inbox for a password reset link.'
-      );
-    })
-    .catch((error) => {
-      console.error('Reset error:', error);
-      let message = 'Could not send reset email.';
-
-      switch (error.code) {
-        case 'auth/user-not-found':
-          message = 'No account exists for that email.';
-          break;
-        case 'auth/invalid-email':
-          message = 'That email address is not valid.';
-          break;
-        default:
-          message = error.message;
-      }
-
-      Alert.alert('Reset Failed', message);
-    });
-};
-
+  // ✅ State declarations must be at the top of the component
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const handleForgotPassword = () => {
+    if (!email) {
+      Alert.alert('Reset Password', 'Please enter your email address first.');
+      return;
+    }
+
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        Alert.alert(
+          'Reset Email Sent',
+          'Check your inbox for a password reset link.'
+        );
+      })
+      .catch((error) => {
+        console.error('Reset error:', error);
+        let message = 'Could not send reset email.';
+
+        switch (error.code) {
+          case 'auth/user-not-found':
+            message = 'No account exists for that email.';
+            break;
+          case 'auth/invalid-email':
+            message = 'That email address is not valid.';
+            break;
+          default:
+            message = error.message;
+        }
+
+        Alert.alert('Reset Failed', message);
+      });
+  };
 
   const handleLogin = async () => {
     setErrors({});
@@ -76,7 +78,7 @@ export default function LoginScreen() {
       await signInWithEmailAndPassword(auth, email, password);
       setLoading(false);
       Alert.alert('Success', 'Logged in successfully');
-      router.replace('/(tabs)/home'); // Redirect to homepage
+      router.replace('/(tabs)/home'); // ✅ Adjust route as needed
     } catch (error) {
       setLoading(false);
       console.log('Login error:', error.code);
@@ -134,7 +136,9 @@ export default function LoginScreen() {
               value={email}
               onChangeText={setEmail}
             />
-            {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
 
             <TextInput
               placeholder="Password"
@@ -144,10 +148,15 @@ export default function LoginScreen() {
               value={password}
               onChangeText={setPassword}
             />
-            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
 
             <TouchableOpacity
-              style={[styles.loginButton, loading && { backgroundColor: '#ccc' }]}
+              style={[
+                styles.loginButton,
+                loading && { backgroundColor: '#ccc' },
+              ]}
               onPress={handleLogin}
               disabled={loading}
             >
@@ -157,10 +166,10 @@ export default function LoginScreen() {
                 <Text style={styles.buttonText}>Log In</Text>
               )}
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleForgotPassword}>
-  <Text style={styles.forgotText}>Forgot Password?</Text>
-</TouchableOpacity>
 
+            <TouchableOpacity onPress={handleForgotPassword}>
+              <Text style={styles.forgotText}>Forgot Password?</Text>
+            </TouchableOpacity>
 
             <Text style={styles.signUpText}>
               Don't have an account?{' '}
@@ -271,10 +280,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   forgotText: {
-  textAlign: 'right',
-  color: primaryColor,
-  marginBottom: 16,
-  textDecorationLine: 'underline',
-},
-
+    textAlign: 'right',
+    color: primaryColor,
+    marginBottom: 16,
+    textDecorationLine: 'underline',
+  },
 });

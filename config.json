@@ -1,6 +1,6 @@
 {
   "expo": {
-    
+    "entryPoint": "./node_modules/expo-router/entry",
     "name": "tvl_fit",
     "slug": "tvl_fit",
     "version": "1.0.0",
